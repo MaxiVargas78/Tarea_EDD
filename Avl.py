@@ -1,271 +1,185 @@
-class Node:
-    def_init_(self, value)
-        self.data=[value]
-        self.parent= None
-        self.childrens =[]
-
-    def _insert(self, new_node)
-        if len(self.childrens)== 0;
-            self._add(new_node)
-        elif new_node.data[0]> self.data[-1]:
-                self.childrens[-1]._insert(new_node)
-        else
-            for i in range(0, len(self.data))
-                if new_node.data[0]< self.data[i]:
-                    self.childrens[i]._insert(new_node)
-                        break
-
-                        class Node():
-    def __init__(self, key):
-        self.key = key
-        self.left = None
-        self.right = None
-
-
-
-
-class AVLTree():
+class ArbolAVL():
     def __init__(self, *args):
         self.node = None
-        self.height = -1
+        self.altura = -1
         self.balance = 0;
 
         if len(args) == 1:
             for i in args[0]:
                 self.insert(i)
 
-    def height(self):
+    def Altura(self):
         if self.node:
-            return self.node.height
+            return self.node.altura
         else:
             return 0
 
-    def is_leaf(self):
-        return (self.height == 0)
+    def Hoja(self):
+        return (self.altura == 0)
 
-    def insert(self, key):
-        tree = self.node
+    def insertar(self, nombre, apellido, celular, correo):
+        arbol = self.node
+        newnode = Node(nombre, apellido, celular, correo)
 
-        newnode = Node(key)
-
-        if tree == None:
+        if arbol == None:
             self.node = newnode
-            self.node.left = AVLTree()
-            self.node.right = AVLTree()
-            debug("Inserted key [" + str(key) + "]")
+            self.node.izq = ArbolAVL()
+            self.node.der = ArbolAVL()
 
-        elif key < tree.key:
-            self.node.left.insert(key)
 
-        elif key > tree.key:
-            self.node.right.insert(key)
+        elif apellido < arbol.getApellido():
+            self.node.izq.insertar(nombre, apellido, celular, correo)
+
+        elif apellido > arbol.getApellido():
+            self.node.der.insertar(nombre, apellido, celular, correo)
 
         else:
-            debug("Key [" + str(key) + "] already in tree.")
-
+            self.node.izq.insertar(nombre, apellido, celular, correo)
         self.rebalance()
 
+    def RotacionIzq(self):
+
+        A = self.node
+        B = self.node.der.node
+        C = B.izq.node
+
+        self.node = B
+        B.izq.node = A
+        A.der.node = C
+
+    def RotacionDer(self):
+
+        A = self.node
+        B = self.node.izq.node
+        C = B.der.node
+
+        self.node = B
+        B.der.node = A
+        A.izq.node = C
+
+
     def rebalance(self):
-        '''
-        Rebalance a particular (sub)tree
-        '''
-        # key inserted. Let's check if we're balanced
-        self.update_heights(False)
-        self.update_balances(False)
+
+        self.Act_altura(False)
+        self.Act_balance(False)
         while self.balance < -1 or self.balance > 1:
             if self.balance > 1:
-                if self.node.left.balance < 0:
-                    self.node.left.lrotate() # we're in case II
-                    self.update_heights()
-                    self.update_balances()
-                self.rrotate()
-                self.update_heights()
-                self.update_balances()
+                if self.node.izq.balance < 0:
+                    self.node.izq.RotacionIzq()
+                    self.Act_altura()
+                    self.Act_balance()
+                self.RotacionDer()
+                self.Act_altura()
+                self.Act_balance()
 
             if self.balance < -1:
-                if self.node.right.balance > 0:
-                    self.node.right.rrotate() # we're in case III
-                    self.update_heights()
-                    self.update_balances()
-                self.lrotate()
-                self.update_heights()
-                self.update_balances()
+                if self.node.der.balance > 0:
+                    self.node.der.RotacionDer()
+                    self.Act_altura()
+                    self.Act_balance()
+                self.RotacionIzq()
+                self.Act_altura()
+                self.Act_balance()
 
 
-
-    def rrotate(self):
-        # Rotate left pivoting on self
-        debug ('Rotating ' + str(self.node.key) + ' right')
-        A = self.node
-        B = self.node.left.node
-        T = B.right.node
-
-        self.node = B
-        B.right.node = A
-        A.left.node = T
-
-
-    def lrotate(self):
-        # Rotate left pivoting on self
-        debug ('Rotating ' + str(self.node.key) + ' left')
-        A = self.node
-        B = self.node.right.node
-        T = B.left.node
-
-        self.node = B
-        B.left.node = A
-        A.right.node = T
-
-
-    def update_heights(self, recurse=True):
-        if not self.node == None:
-            if recurse:
-                if self.node.left != None:
-                    self.node.left.update_heights()
-                if self.node.right != None:
-                    self.node.right.update_heights()
-
-            self.height = max(self.node.left.height,
-                              self.node.right.height) + 1
-        else:
-            self.height = -1
-
-    def update_balances(self, recurse=True):
-        if not self.node == None:
-            if recurse:
-                if self.node.left != None:
-                    self.node.left.update_balances()
-                if self.node.right != None:
-                    self.node.right.update_balances()
-
-            self.balance = self.node.left.height - self.node.right.height
-        else:
-            self.balance = 0
-
-    def delete(self, key):
-        # debug("Trying to delete at node: " + str(self.node.key))
-        if self.node != None:
-            if self.node.key == key:
-                debug("Deleting ... " + str(key))
-                if self.node.left.node == None and self.node.right.node == None:
-                    self.node = None # leaves can be killed at will
-                # if only one subtree, take that
-                elif self.node.left.node == None:
-                    self.node = self.node.right.node
-                elif self.node.right.node == None:
-                    self.node = self.node.left.node
-
-                # worst-case: both children present. Find logical successor
-                else:
-                    replacement = self.logical_successor(self.node)
-                    if replacement != None: # sanity check
-                        debug("Found replacement for " + str(key) + " -> " + str(replacement.key))
-                        self.node.key = replacement.key
-
-                        # replaced. Now delete the key from right child
-                        self.node.right.delete(replacement.key)
-
-                self.rebalance()
-                return
-            elif key < self.node.key:
-                self.node.left.delete(key)
-            elif key > self.node.key:
-                self.node.right.delete(key)
-
-            self.rebalance()
-        else:
-            return
-
-    def logical_predecessor(self, node):
-        '''
-        Find the biggest valued node in LEFT child
-        '''
+    def Anterior(self, node):
         node = node.left.node
-        if node != None:
-            while node.right != None:
-                if node.right.node == None:
+        if node is not None:
+            while node.der is not None:
+                if node.der.node == None:
                     return node
                 else:
                     node = node.right.node
         return node
 
-    def logical_successor(self, node):
-        '''
-        Find the smallese valued node in RIGHT child
-        '''
-        node = node.right.node
-        if node != None: # just a sanity check
-
-            while node.left != None:
-                debug("LS: traversing: " + str(node.key))
-                if node.left.node == None:
+    def siguiente(self, node):
+        node = node.der.node
+        if node is not None:
+            while node.izq is not None:
+                if node.izq.node == None:
                     return node
                 else:
-                    node = node.left.node
+                    node = node.izq.node
         return node
 
-    def check_balanced(self):
+    def Act_altura(self, b=True):
+        if not self.node == None:
+            if b:
+                if self.node.izq != None:
+                    self.node.izq.Act_altura()
+                if self.node.der != None:
+                    self.node.der.Act_altura()
+
+            self.altura = max(self.node.izq.altura,
+                              self.node.der.altura) + 1
+        else:
+            self.altura = -1
+
+    def Act_balance(self, b=True):
+        if not self.node == None:
+            if b:
+                if self.node.izq != None:
+                    self.node.izq.Act_balance()
+                if self.node.der != None:
+                    self.node.der.Act_balance()
+
+            self.balance = self.node.izq.altura - self.node.der.altura
+        else:
+            self.balance = 0
+
+    def buscar(self,info):                                                          #BUSCAR
+        if(self.node is not None):
+            if self.node.llave == info:
+                print(True)
+                return True
+            self.node.izq.buscar(info)
+            self.node.der.buscar(info)
+        return
+
+
+    def Borrar(self, key):
+        if self.node is not None:
+            if self.node.getApellido() == llave:
+
+                if self.node.izq.node == None and self.node.der.node == None:
+                    self.node = None
+
+                elif self.node.izq.node == None:
+                     self.node = self.node.der.node
+
+                elif self.node.der.node == None:
+                    self.node = self.node.izq.node
+
+
+                else:
+                    reemplazar = self.siguiente(self.node)
+                    if reemplazar is not None:
+                        self.node.setApellido(reemplazar.key)
+                        self.node.right.Borrar(reemplazar.key)
+
+                self.rebalance()
+                return
+            elif info < self.node.getApellido():
+                self.node.izq.Borrar()
+
+            elif info > self.node.getApellido():
+                self.node.der.Borrar(info)
+
+            self.rebalance()
+        else:
+            return
+
+    def RevisarBalance(self):
         if self == None or self.node == None:
             return True
+        self.Act_altura()
+        self.Act_balance()
+        return ((abs(self.balance) < 2) and self.node.izq.RevisarBalance() and self.node.der.RevisarBalance())
 
-        # We always need to make sure we are balanced
-        self.update_heights()
-        self.update_balances()
-        return ((abs(self.balance) < 2) and self.node.left.check_balanced() and self.node.right.check_balanced())
-
-    def inorder_traverse(self):
-        if self.node == None:
-            return []
-
-        inlist = []
-        l = self.node.left.inorder_traverse()
-        for i in l:
-            inlist.append(i)
-
-        inlist.append(self.node.key)
-
-        l = self.node.right.inorder_traverse()
-        for i in l:
-            inlist.append(i)
-
-        return inlist
-
-    def display(self, level=0, pref=''):
-        '''
-        Display the whole tree. Uses recursive def.
-        TODO: create a better display using breadth-first search
-        '''
-        self.update_heights()  # Must update heights before balances
-        self.update_balances()
-        if(self.node != None):
-            print '-' * level * 2, pref, self.node.key, "[" + str(self.height) + ":" + str(self.balance) + "]", 'L' if self.is_leaf() else ' '
-            if self.node.left != None:
-                self.node.left.display(level + 1, '<')
-            if self.node.left != None:
-                self.node.right.display(level + 1, '>')
-
-
-
-
-# Usage example
-if __name__ == "__main__":
-    a = AVLTree()
-    print "----- Inserting -------"
-    #inlist = [5, 2, 12, -4, 3, 21, 19, 25]
-    inlist = [7, 5, 2, 6, 3, 4, 1, 8, 9, 0]
-    for i in inlist:
-        a.insert(i)
-
-    a.display()
-
-    print "----- Deleting -------"
-    a.delete(3)
-    a.delete(4)
-    # a.delete(5)
-    a.display()
-
-    print
-    print "Input            :", inlist
-    print "deleting ...       ", 3
-    print "deleting ...       ", 4
-    print "Inorder traversal:", a.inorder_traverse() 
+    def imprimir(self):                                                            #IMPRIMIR
+        self.Act_altura()
+        self.Act_balance()
+        if(self.node is not None):
+            self.node.izq.imprimir()
+            print (self.node.getApellido())
+            self.node.der.imprimir()

@@ -1,39 +1,58 @@
 class Node:
-    def __init__(self, data):
-        self.data = data
+    def __init__(self, nombre, apellido, celular, correo):
+        self.data = data(nombre, apellido, celular, correo)
         self.next_node = None
         self.prev_node = None
 
-class ListaDoblementeEnlazada:
+class DobleEnlace:
     def __init__(self):
         self.head = None
         self.tail = None
 
-    def empty(self):
+    def Vacio(self):
         return self.head == None
 
-    def insert_last(self, element):
-        if self.empty():
-            self.head = Node(element)
+    def InsertarFinal(self, element):
+        if self.Vacio():
+            self.head = data
             self.tail = self.head
         else:
-            node  = Node(element)
-            self.tail.next_node = node
+            data  = data(nombre, apellido, celular, correo)
+            self.tail.next_node = data
             node.prev_node = self.tail
-            self.tail = node
+            self.tail = data
 
-    def insert_first(self, element):
-        if self.empty():
-            self.head = Node(element)
+    def InsertarInicio(self, elemento):
+        if self.Vacio():
+            self.head = data
             self.tail = self.head
         else:
-            node = Node(element)
+            data = data(nombre, apellido, celular, correo)
             node.next_node = self.head
-            self.head.prev_node = node
-            self.head = node
+            self.head.prev_node = data
+            self.head = data
 
-    def print_list(self):
-        if self.empty():
+    def Borrar(self,elemento):								#ELIMINA UN CONTACTO POR DATO
+		if self.head == None:
+			return
+
+		aux = self.head
+		prev = aux
+
+		if aux.getapellido() == elemento:
+			self.head = aux.getNext()
+
+		while aux is not None:
+			if aux.getapellido() == elemento:
+				prev.setNext(aux.getNext())
+				return
+			else:
+				prev = aux
+				aux = aux.getNext()
+
+
+    def Imprimir(self):
+        if self.Vacio():
              print("Lista vacia")
         else:
             temp = self.head
